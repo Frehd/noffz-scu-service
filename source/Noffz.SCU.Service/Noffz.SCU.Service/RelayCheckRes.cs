@@ -12,14 +12,17 @@ namespace Noffz.SCU.Service
         public class RelayCheck
         {
             public uint[] counts { get; }
-            public int errors;
-            public int warnings;
+            public int[] warning_indexes;
+            public int[] error_indexes;
 
             public RelayCheck(uint[] counts, Config config)
             {
                 this.counts = counts;
-                warnings = counts.Where(c => c > config.warningCycles).Count();
-                errors = counts.Where(c => c > config.errorCycles).Count();
+                var indexed_counts = counts.Select((value, index) => new { value, index });
+                var b = indexed_counts.Where(c => c.value > config.warningCycles).ToArray();
+
+                warning_indexes = indexed_counts.Where(c => c.value > config.warningCycles).Select(c => c.index).ToArray();
+                error_indexes = indexed_counts.Where(c => c.value > config.errorCycles).Select(c => c.index).ToArray();
 
             }
         }
