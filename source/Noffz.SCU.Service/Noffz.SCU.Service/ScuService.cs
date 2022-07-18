@@ -11,6 +11,7 @@ namespace Noffz.SCU.Service
     {
         private Config config;
         private ScuSession scu = null;
+        private ScuCard[] cards = null;
 
         public ScuService(ConnectionParams c_params, Config config)
         {
@@ -30,6 +31,26 @@ namespace Noffz.SCU.Service
                     scu = new ScuSession(ip.IPAddress);
                     break;
             }
+        }
+
+        public int discoverCards(int startCardAddress, int endCardAddress)
+        {
+            cards = scu.FindAllCards(startCardAddress, endCardAddress);
+
+            return cards.Length;
+        }
+
+        public RelayCheckRes checkRelayCounters()
+        {
+            Dictionary<ScuCard, uint[]> cardRelayCounts = new Dictionary<ScuCard, uint[]>();
+            foreach (ScuCard card in cards)
+            {
+                uint[] arr = card.GetAllRelaysCounter();
+                cardRelayCounts.Add(card, arr);
+            }
+
+            RelayCheckRes relayCheckRes = new RelayCheckRes(cardRelayCounts, config);
+            return relayCheckRes;
         }
     }
 }

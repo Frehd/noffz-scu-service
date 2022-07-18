@@ -11,7 +11,7 @@ namespace Noffz.SCU.Service
         static void Main(string[] args)
         {
             Console.WriteLine($"NOFFZ SCU Service Console has been run. You passed the following arguments: {String.Join(",",args)}");
-            var service = new ScuService();
+            var service = new ScuService(new ConnectionParams.IP("192.168.0.1"), new Config(100_000, 150_000));
         }
     }
 }

@@ -5,5 +5,10 @@
         public uint warningCycles { get; }
         public uint errorCycles { get; }
 
+        public Config(uint warningCycles, uint errorCycles)
+        {
+            this.warningCycles = warningCycles;
+            this.errorCycles = errorCycles;
+        }
     }
 }
