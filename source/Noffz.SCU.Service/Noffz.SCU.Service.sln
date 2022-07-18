@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noffz.SCU.Service", "Noffz.SCU.Service\Noffz.SCU.Service.csproj", "{813CDAFD-972B-4EF7-B359-93ED3FB8F865}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noffz.SCU.Service.Console", "Noffz.SCU.Service.Console\Noffz.SCU.Service.Console.csproj", "{8B419E0B-21FF-4E22-A74F-70D5DFB26C20}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{813CDAFD-972B-4EF7-B359-93ED3FB8F865}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{813CDAFD-972B-4EF7-B359-93ED3FB8F865}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{813CDAFD-972B-4EF7-B359-93ED3FB8F865}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{813CDAFD-972B-4EF7-B359-93ED3FB8F865}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B419E0B-21FF-4E22-A74F-70D5DFB26C20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B419E0B-21FF-4E22-A74F-70D5DFB26C20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B419E0B-21FF-4E22-A74F-70D5DFB26C20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B419E0B-21FF-4E22-A74F-70D5DFB26C20}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4AD3A39-663D-4772-A137-6357AF7BFADF}
+	EndGlobalSection
+EndGlobal
