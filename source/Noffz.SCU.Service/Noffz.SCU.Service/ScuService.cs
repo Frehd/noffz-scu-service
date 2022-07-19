@@ -10,8 +10,8 @@ namespace Noffz.SCU.Service
     public class ScuService
     {
         private Config config;
-        private ScuSession scu = null;
-        private ScuCard[] cards = null;
+        public ScuSession scu { get; set; } = null;
+        public ScuCard[] cards { get; set; } = null;
 
         public ScuService(ConnectionParams c_params, Config config)
         {
@@ -46,7 +46,17 @@ namespace Noffz.SCU.Service
             foreach (ScuCard card in cards)
             {
                 uint[] arr = card.GetAllRelaysCounter();
+                if (arr.Length == 0)
+                {
+                    Console.WriteLine($"Addressing Relays one by one! (Addr: {card.Address})");
+                    arr = new uint[card.NumberOfOutputChannels];
+                    for (int i = 0; i < card.NumberOfOutputChannels; i++)
+                    {
+                        arr[i] = card.GetRelayCounter(i);
+                    }
+                }
                 cardRelayCounts.Add(card, arr);
+
             }
 
             RelayCheckRes relayCheckRes = new RelayCheckRes(cardRelayCounts, config);
