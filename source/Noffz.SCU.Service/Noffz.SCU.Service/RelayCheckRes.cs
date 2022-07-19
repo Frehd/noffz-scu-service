@@ -19,10 +19,9 @@ namespace Noffz.SCU.Service
             {
                 this.counts = counts;
                 var indexed_counts = counts.Select((value, index) => new { value, index });
-                var b = indexed_counts.Where(c => c.value > config.warningCycles).ToArray();
 
-                warning_indexes = indexed_counts.Where(c => c.value > config.warningCycles).Select(c => c.index).ToArray();
-                error_indexes = indexed_counts.Where(c => c.value > config.errorCycles).Select(c => c.index).ToArray();
+                warning_indexes = indexed_counts.Where(c => c.value >= config.warningCycles && c.value < config.errorCycles).Select(c => c.index).ToArray();
+                error_indexes = indexed_counts.Where(c => c.value >= config.errorCycles).Select(c => c.index).ToArray();
 
             }
         }
@@ -40,6 +39,20 @@ namespace Noffz.SCU.Service
 
                 RelayCheck relayCheck = new RelayCheck(card.Value, config);
                 cardRelayChecks.Add(card.Key, relayCheck);
+            }
+
+            totalRelayCheck = new RelayCheck(allCounts.ToArray(), config);
+        }
+
+        public RelayCheckRes(Dictionary<ScuCard, RelayCheck> cardRelayCounts, Config config)
+        {
+            List<uint> allCounts = new List<uint>();
+
+            foreach (var cardCheck in cardRelayCounts)
+            {
+                allCounts.AddRange(cardCheck.Value.counts);
+
+                cardRelayChecks.Add(cardCheck.Key, cardCheck.Value);
             }
 
             totalRelayCheck = new RelayCheck(allCounts.ToArray(), config);
