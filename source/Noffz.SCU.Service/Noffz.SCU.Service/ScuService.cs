@@ -9,7 +9,7 @@ namespace Noffz.SCU.Service
 {
     public class ScuService
     {
-        private Config config;
+        public Config config { get; set; }
         public ScuSession scu { get; set; } = null;
         public ScuCard[] cards { get; set; } = null;
 
@@ -40,23 +40,26 @@ namespace Noffz.SCU.Service
             return cards.Length;
         }
 
-        public RelayCheckRes checkRelayCounters()
+        public RelayCheckRes.RelayCheck checkRelayCounters(ScuCard card)
         {
-            Dictionary<ScuCard, uint[]> cardRelayCounts = new Dictionary<ScuCard, uint[]>();
+            uint[] arr = card.GetAllRelaysCounter();
+            if (arr.Length == 0)
+            {
+                Console.WriteLine($"Addressing Relays one by one! (Addr: {card.Address})");
+                arr = new uint[card.NumberOfOutputChannels];
+                for (int i = 0; i < card.NumberOfOutputChannels; i++)
+                {
+                    arr[i] = card.GetRelayCounter(i);
+                }
+            }
+            return new RelayCheckRes.RelayCheck(arr, config);
+        }
+        public RelayCheckRes checkEveryCardsRelayCounters()
+        {
+            Dictionary<ScuCard, RelayCheckRes.RelayCheck> cardRelayCounts = new Dictionary<ScuCard, RelayCheckRes.RelayCheck>();
             foreach (ScuCard card in cards)
             {
-                uint[] arr = card.GetAllRelaysCounter();
-                if (arr.Length == 0)
-                {
-                    Console.WriteLine($"Addressing Relays one by one! (Addr: {card.Address})");
-                    arr = new uint[card.NumberOfOutputChannels];
-                    for (int i = 0; i < card.NumberOfOutputChannels; i++)
-                    {
-                        arr[i] = card.GetRelayCounter(i);
-                    }
-                }
-                cardRelayCounts.Add(card, arr);
-
+                cardRelayCounts.Add(card, checkRelayCounters(card));
             }
 
             RelayCheckRes relayCheckRes = new RelayCheckRes(cardRelayCounts, config);
