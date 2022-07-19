@@ -52,13 +52,13 @@ namespace Noffz.SCU.Service
                 Console.WriteLine($"\tNumber of inputs: {card.NumberOfInputChannels}, Number of outputs: {card.NumberOfOutputChannels}");
                 Console.WriteLine("\n\tRelay info:");
 
-                Console.WriteLine($"\t\tTotal errors: {res.cardRelayChecks[card].error_indexes.Length}, total warnings: {res.cardRelayChecks[card].warning_indexes.Length}");
-                Console.WriteLine($"\t\tRelays with warnings (>{service.Config.warningCycles} cycles): {string.Join(",", res.cardRelayChecks[card].warning_indexes)}");
-                Console.WriteLine($"\t\tRelays with errors (>{service.Config.errorCycles} cycles): {string.Join(",", res.cardRelayChecks[card].error_indexes)}");
+                Console.WriteLine($"\t\tTotal errors: {res.CardRelayChecks[card].Error_indexes.Length}, total warnings: {res.CardRelayChecks[card].Warning_indexes.Length}");
+                Console.WriteLine($"\t\tRelays with warnings (>{service.Config.WarningCycles} cycles): {string.Join(",", res.CardRelayChecks[card].Warning_indexes)}");
+                Console.WriteLine($"\t\tRelays with errors (>{service.Config.ErrorCycles} cycles): {string.Join(",", res.CardRelayChecks[card].Error_indexes)}");
 
             }
 
-            Console.WriteLine($"\nTotal errors: {res.totalRelayCheck.error_indexes.Length}, total warnings: {res.totalRelayCheck.warning_indexes.Length}");
+            Console.WriteLine($"\nTotal errors: {res.TotalRelayCheck.Error_indexes.Length}, total warnings: {res.TotalRelayCheck.Warning_indexes.Length}");
 
             Console.WriteLine("Done!");
         }

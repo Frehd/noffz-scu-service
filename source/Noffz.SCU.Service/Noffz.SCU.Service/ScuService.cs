@@ -25,7 +25,7 @@ namespace Noffz.SCU.Service
             switch (c_params)
             {
                 case ConnectionParams.COMPort comport:
-                    Scu = new ScuSession(comport.comPortNumber);
+                    Scu = new ScuSession(comport.ComPortNumber);
                     break;
                 case ConnectionParams.IP ip:
                     Scu = new ScuSession(ip.IPAddress);

@@ -6,11 +6,11 @@ namespace Noffz.SCU.Service
     {
         public class COMPort : ConnectionParams
         {
-            public Int32 comPortNumber;
+            public Int32 ComPortNumber;
 
             public COMPort(int comPortNumber)
             {
-                this.comPortNumber = comPortNumber;
+                this.ComPortNumber = comPortNumber;
             }
         }
         public class IP : ConnectionParams

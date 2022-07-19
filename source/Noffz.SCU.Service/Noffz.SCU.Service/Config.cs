@@ -2,13 +2,13 @@
 {
     public class Config
     {
-        public uint warningCycles { get; }
-        public uint errorCycles { get; }
+        public uint WarningCycles { get; }
+        public uint ErrorCycles { get; }
 
         public Config(uint warningCycles, uint errorCycles)
         {
-            this.warningCycles = warningCycles;
-            this.errorCycles = errorCycles;
+            this.WarningCycles = warningCycles;
+            this.ErrorCycles = errorCycles;
         }
     }
 }
