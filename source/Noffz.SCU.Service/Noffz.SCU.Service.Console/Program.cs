@@ -1,15 +1,37 @@
-﻿using Noffz.SCU.API;
+﻿using CommandLine;
+using Noffz.SCU.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 
+
 namespace Noffz.SCU.Service
 {
     class Program
     {
+
+        class Options
+        {
+            [Option('c', "config", Required = true, HelpText = "Path to config file.")]
+            public string ConfigPath { get; set; }
+
+            [Option('r', "report", Default = false, HelpText = "Generate a report.")]
+            public bool GenerateReport { get; set; }
+
+            [Option('o', "out", Default = "", HelpText = "Output path for report")]
+            public string ReportPath { get; set; }
+        }
+
         static void Main(string[] args)
+        {
+            CommandLine.Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(opts => RunOptions(opts, args));
+
+        }
+
+        static void RunOptions(Options opts, string[] args)
         {
             Console.WriteLine($"NOFFZ SCU Service Console has been run. You passed the following arguments: {String.Join(",", args)}");
             ScuService service = null;
@@ -60,6 +82,11 @@ namespace Noffz.SCU.Service
             }
 
             Console.WriteLine($"\nTotal errors: {res.TotalRelayCheck.Error_indexes.Length}, total warnings: {res.TotalRelayCheck.Warning_indexes.Length}");
+
+            if (opts.GenerateReport)
+            {
+
+            }
 
             Console.WriteLine("Done!");
         }
