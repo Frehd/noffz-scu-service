@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Noffz.SCU.API;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,7 +28,7 @@ namespace Noffz.SCU.Service
             int MinCardAddress = 0;
             int MaxCardAddress = 20;
             Console.Write($"\nSearching for installed cards in address range {MinCardAddress}-{MaxCardAddress}...");
-            service.discoverCards(0, 20);
+            service.DiscoverCards(0, 20);
             Console.WriteLine($"Found {service.Cards.Length} device(s).");
 
             if (service.Cards.Length == 0)
@@ -36,14 +37,14 @@ namespace Noffz.SCU.Service
             }
 
             Console.WriteLine("Card info:");
-            foreach (var card in service.Cards)
+            foreach (ScuCard card in service.Cards)
             {
                 Console.WriteLine($"\tAddress: {card.Address}\tFirmware version: {card.FirmwareVersion}");
             }
 
-            RelayCheckRes res = service.checkEveryCardsRelayCounters();
+            RelayCheckRes res = service.CheckEveryCardsRelayCounters();
 
-            foreach (var card in service.Cards)
+            foreach (ScuCard card in service.Cards)
             {
                 Console.WriteLine($"\nChecking card with address: {card.Address}");
                 Console.WriteLine($"\tFirmware version: {card.FirmwareVersion}");

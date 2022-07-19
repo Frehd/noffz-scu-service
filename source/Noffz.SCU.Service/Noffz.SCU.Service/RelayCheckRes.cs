@@ -33,7 +33,7 @@ namespace Noffz.SCU.Service
         {
             List<uint> allCounts = new List<uint>();
 
-            foreach (var card in cardRelayCounts)
+            foreach (KeyValuePair<ScuCard, uint[]> card in cardRelayCounts)
             {
                 allCounts.AddRange(card.Value);
 
@@ -48,7 +48,7 @@ namespace Noffz.SCU.Service
         {
             List<uint> allCounts = new List<uint>();
 
-            foreach (var cardCheck in cardRelayCounts)
+            foreach (KeyValuePair<ScuCard, RelayCheck> cardCheck in cardRelayCounts)
             {
                 allCounts.AddRange(cardCheck.Value.Counts);
 

@@ -33,14 +33,14 @@ namespace Noffz.SCU.Service
             }
         }
 
-        public int discoverCards(int startCardAddress, int endCardAddress)
+        public int DiscoverCards(int startCardAddress, int endCardAddress)
         {
             Cards = Scu.FindAllCards(startCardAddress, endCardAddress);
 
             return Cards.Length;
         }
 
-        public RelayCheckRes.RelayCheck checkRelayCounters(ScuCard card)
+        public RelayCheckRes.RelayCheck CheckRelayCounters(ScuCard card)
         {
             uint[] arr = card.GetAllRelaysCounter();
             if (arr.Length == 0)
@@ -54,12 +54,12 @@ namespace Noffz.SCU.Service
             }
             return new RelayCheckRes.RelayCheck(arr, Config);
         }
-        public RelayCheckRes checkEveryCardsRelayCounters()
+        public RelayCheckRes CheckEveryCardsRelayCounters()
         {
             Dictionary<ScuCard, RelayCheckRes.RelayCheck> cardRelayCounts = new Dictionary<ScuCard, RelayCheckRes.RelayCheck>();
             foreach (ScuCard card in Cards)
             {
-                cardRelayCounts.Add(card, checkRelayCounters(card));
+                cardRelayCounts.Add(card, CheckRelayCounters(card));
             }
 
             RelayCheckRes relayCheckRes = new RelayCheckRes(cardRelayCounts, Config);
