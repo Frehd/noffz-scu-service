@@ -14,6 +14,12 @@ namespace Noffz.SCU.Service
 
         class Options
         {
+            [Option('i', "interface", Required = true, HelpText = "\"lan\"/\"com\" The interface for the connection.")]
+            public string Interface { get; set; }
+
+            [Option('a', "addr", Required = true, HelpText = "The IP-Address or COMPort number.")]
+            public string Address { get; set; }
+
             [Option('c', "config", Required = true, HelpText = "Path to config file.")]
             public string ConfigPath { get; set; }
 
@@ -36,9 +42,21 @@ namespace Noffz.SCU.Service
             Console.WriteLine($"NOFFZ SCU Service Console has been run. You passed the following arguments: {String.Join(",", args)}");
             ScuService service = null;
 
+            if (opts.Interface != "lan" && opts.Interface != "com")
+            {
+                throw new ApplicationException($"Interface option not recognized: {opts.Interface}");
+            }
+
             try
             {
-                service = new ScuService(new ConnectionParams.IP("192.168.0.11"), new Config(100, 800));
+                if (opts.Interface == "lan")
+                {
+                    service = new ScuService(new ConnectionParams.IP(opts.Address), new Config(100, 800));
+                }
+                else if (opts.Interface == "com")
+                {
+                    service = new ScuService(new ConnectionParams.COMPort(int.Parse(opts.Address)), new Config(100, 800));
+                }
             }
             catch (Exception e)
             {
