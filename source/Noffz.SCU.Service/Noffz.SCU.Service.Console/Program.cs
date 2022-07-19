@@ -28,22 +28,22 @@ namespace Noffz.SCU.Service
             int MaxCardAddress = 20;
             Console.Write($"\nSearching for installed cards in address range {MinCardAddress}-{MaxCardAddress}...");
             service.discoverCards(0, 20);
-            Console.WriteLine($"Found {service.cards.Length} device(s).");
+            Console.WriteLine($"Found {service.Cards.Length} device(s).");
 
-            if (service.cards.Length == 0)
+            if (service.Cards.Length == 0)
             {
                 throw new ApplicationException("No cards found!");
             }
 
             Console.WriteLine("Card info:");
-            foreach (var card in service.cards)
+            foreach (var card in service.Cards)
             {
                 Console.WriteLine($"\tAddress: {card.Address}\tFirmware version: {card.FirmwareVersion}");
             }
 
             RelayCheckRes res = service.checkEveryCardsRelayCounters();
-            
-            foreach (var card in service.cards)
+
+            foreach (var card in service.Cards)
             {
                 Console.WriteLine($"\nChecking card with address: {card.Address}");
                 Console.WriteLine($"\tFirmware version: {card.FirmwareVersion}");
@@ -53,8 +53,8 @@ namespace Noffz.SCU.Service
                 Console.WriteLine("\n\tRelay info:");
 
                 Console.WriteLine($"\t\tTotal errors: {res.cardRelayChecks[card].error_indexes.Length}, total warnings: {res.cardRelayChecks[card].warning_indexes.Length}");
-                Console.WriteLine($"\t\tRelays with warnings (>{service.config.warningCycles} cycles): {string.Join(",", res.cardRelayChecks[card].warning_indexes)}");
-                Console.WriteLine($"\t\tRelays with errors (>{service.config.errorCycles} cycles): {string.Join(",", res.cardRelayChecks[card].error_indexes)}");
+                Console.WriteLine($"\t\tRelays with warnings (>{service.Config.warningCycles} cycles): {string.Join(",", res.cardRelayChecks[card].warning_indexes)}");
+                Console.WriteLine($"\t\tRelays with errors (>{service.Config.errorCycles} cycles): {string.Join(",", res.cardRelayChecks[card].error_indexes)}");
 
             }
 
