@@ -29,27 +29,42 @@ namespace Noffz.SCU.Service
             return Cards.Length;
         }
 
-        public RelayCheckRes.RelayCheck CheckRelayCounters(ScuCard card)
+        public RelayCheckRes.RelayCheck CheckRelays(ScuCard card)
         {
-            uint[] arr = card.GetAllRelaysCounter();
-            if (arr.Length == 0)
+            uint[] cnt_arr;
+            bool[] state_arr;
+            try
+            {
+                cnt_arr = card.GetAllRelaysCounter();
+                state_arr = card.GetAllRelaysState();
+            }
+            catch
+            {
+                cnt_arr = new uint[0];
+                state_arr = new bool[0];
+            }
+
+
+            if (cnt_arr.Length == 0)
             {
                 Console.WriteLine($"Addressing Relays one by one! (Addr: {card.Address})");
-                arr = new uint[card.NumberOfOutputChannels];
+                cnt_arr = new uint[card.NumberOfOutputChannels];
+                state_arr = new bool[card.NumberOfOutputChannels];
                 for (int i = 0; i < card.NumberOfOutputChannels; i++)
                 {
-                    arr[i] = card.GetRelayCounter(i);
+                    cnt_arr[i] = card.GetRelayCounter(i);
+                    state_arr[i] = card.GetRelayState(i);
                 }
             }
-            return new RelayCheckRes.RelayCheck(arr, Config);
+            return new RelayCheckRes.RelayCheck(cnt_arr, state_arr, Config);
         }
 
-        public RelayCheckRes CheckEveryCardsRelayCounters()
+        public RelayCheckRes CheckEveryCardsRelays()
         {
             Dictionary<ScuCard, RelayCheckRes.RelayCheck> cardRelayCounts = new Dictionary<ScuCard, RelayCheckRes.RelayCheck>();
             foreach (ScuCard card in Cards)
             {
-                cardRelayCounts.Add(card, CheckRelayCounters(card));
+                cardRelayCounts.Add(card, CheckRelays(card));
             }
 
             RelayCheckRes relayCheckRes = new RelayCheckRes(cardRelayCounts, Config);
@@ -58,11 +73,11 @@ namespace Noffz.SCU.Service
 
         public ReportValues GenerateReport()
         {
-            RelayCheckRes res = CheckEveryCardsRelayCounters();
+            RelayCheckRes res = CheckEveryCardsRelays();
             var totalCardErrors = 0;
 
             ReportValues reportValues = new ReportValues(
-               currentTime: DateTime.Now,
+               currentTime: DateTime.Now.ToString(),
                connectionType: connectionParams.GetConnectionName(),
                connectionAddress: connectionParams.GetConnectionAddress(),
                scannedCards: res.CardRelayChecks.Count,
@@ -89,6 +104,8 @@ namespace Noffz.SCU.Service
                     numberOfErrors: errors.Length,
                     errors: string.Join(",", errors),
                     relayCounts: cardRes.Counts,
+                    relayStates: cardRes.States,
+                    relayCycleWarningStates: cardRes.CycleWarningStates,
                     relayWarningIndexes: cardRes.Warning_indexes,
                     relayErrorIndexes: cardRes.Error_indexes,
                     relayWarnings: cardRes.Warning_indexes.Length,
