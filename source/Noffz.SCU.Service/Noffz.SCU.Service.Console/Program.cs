@@ -26,8 +26,11 @@ namespace Noffz.SCU.Service
             [Option('r', "report", Default = false, HelpText = "Generate a report.")]
             public bool GenerateReport { get; set; }
 
-            [Option('o', "out", Default = "", HelpText = "Output path for report")]
+            [Option('o', "out", Default = "", HelpText = "Output path for report.")]
             public string ReportPath { get; set; }
+
+            [Option("card-range", Default = "0-20", HelpText = "Card Address range to be scanned.")]
+            public string CardAddressRange { get; set; }
         }
 
         static void Main(string[] args)
@@ -51,11 +54,15 @@ namespace Noffz.SCU.Service
             {
                 if (opts.Interface == "lan")
                 {
-                    service = new ScuService(new ConnectionParams.IP(opts.Address), new Config(100, 800));
+                    var factory = new IPConnectionParamsCreator(opts.Address);
+                    var con = factory.Create();
+                    service = new ScuService(con, new Config(100, 800));
                 }
                 else if (opts.Interface == "com")
                 {
-                    service = new ScuService(new ConnectionParams.COMPort(int.Parse(opts.Address)), new Config(100, 800));
+                    var factory = new COMPortConnectionParamsCreator(int.Parse(opts.Address));
+                    var con = factory.Create();
+                    service = new ScuService(con, new Config(100, 800));
                 }
             }
             catch (Exception e)
@@ -67,8 +74,23 @@ namespace Noffz.SCU.Service
 
             int MinCardAddress = 0;
             int MaxCardAddress = 20;
+
+            if (!String.IsNullOrEmpty(opts.CardAddressRange))
+            {
+                try
+                {
+                    var range = opts.CardAddressRange.Split('-').Select(x => int.Parse(x)).ToArray();
+                    MinCardAddress = range.Min();
+                    MaxCardAddress = range.Max();
+                }
+                catch
+                {
+                    Console.WriteLine("Unable to parse your answer. Default scan range will be used.");
+                }
+            }
+
             Console.Write($"\nSearching for installed cards in address range {MinCardAddress}-{MaxCardAddress}...");
-            service.DiscoverCards(0, 20);
+            service.DiscoverCards(MinCardAddress, MaxCardAddress);
             Console.WriteLine($"Found {service.Cards.Length} device(s).");
 
             if (service.Cards.Length == 0)
@@ -82,24 +104,26 @@ namespace Noffz.SCU.Service
                 Console.WriteLine($"\tAddress: {card.Address}\tFirmware version: {card.FirmwareVersion}");
             }
 
-            RelayCheckRes res = service.CheckEveryCardsRelayCounters();
+            Console.WriteLine("Reading card info...");
+            ReportValues rep = service.GenerateReport();
 
-            foreach (ScuCard card in service.Cards)
+            foreach (CardReportValues card in rep.CardReports)
             {
                 Console.WriteLine($"\nChecking card with address: {card.Address}");
                 Console.WriteLine($"\tFirmware version: {card.FirmwareVersion}");
-                string[] errors = card.GetErrors();
-                Console.WriteLine($"\tError count: {errors.Length}\n\tErrors: {(errors.Length == 0 ? "No errors" : String.Join(", ", errors))}");
+                Console.WriteLine($"\tError count: {card.NumberOfErrors}\n\tErrors: {(card.NumberOfErrors == 0 ? "No errors" : card.Errors)}");
                 Console.WriteLine($"\tNumber of inputs: {card.NumberOfInputChannels}, Number of outputs: {card.NumberOfOutputChannels}");
                 Console.WriteLine("\n\tRelay info:");
 
-                Console.WriteLine($"\t\tTotal errors: {res.CardRelayChecks[card].Error_indexes.Length}, total warnings: {res.CardRelayChecks[card].Warning_indexes.Length}");
-                Console.WriteLine($"\t\tRelays with warnings (>{service.Config.WarningCycles} cycles): {string.Join(",", res.CardRelayChecks[card].Warning_indexes)}");
-                Console.WriteLine($"\t\tRelays with errors (>{service.Config.ErrorCycles} cycles): {string.Join(",", res.CardRelayChecks[card].Error_indexes)}");
+                Console.WriteLine($"\t\tTotal errors: {card.RelayErrors}, total warnings: {card.RelayWarnings}");
+                Console.WriteLine($"\t\tRelays with warnings (>{rep.WarningCycles} cycles): {string.Join(",", card.RelayWarningIndexes)}");
+                Console.WriteLine($"\t\tRelays with errors (>{rep.ErrorCycles} cycles): {string.Join(",", card.RelayErrorIndexes)}");
+
 
             }
 
-            Console.WriteLine($"\nTotal errors: {res.TotalRelayCheck.Error_indexes.Length}, total warnings: {res.TotalRelayCheck.Warning_indexes.Length}");
+            Console.WriteLine($"\nTotal relay errors: {rep.TotalRelayErrors}, total relay warnings: {rep.TotalRelayWarnings}");
+            Console.WriteLine($"Total card errors: {rep.TotalCardErrors}");
 
             if (opts.GenerateReport)
             {

@@ -11,27 +11,36 @@ namespace Noffz.SCU.Service
     {
 
         public DateTime CurrentTime;
+        public string ConnectionType;
+        public string ConnectionAddress;
         public int ScannedCards;
         public uint WarningCycles;
         public uint ErrorCycles;
         public int TotalRelayWarnings;
         public int TotalRelayErrors;
+        public int TotalCardErrors;
 
         public ReportValues(
             DateTime currentTime,
+            string connectionType,
+            string connectionAddress,
             int scannedCards,
             uint warningCycles,
             uint errorCycles,
             int totalRelayWarnings,
             int totalRelayErrors,
+            int totalCardErrors,
             CardReportValues[] cardReports)
         {
             CurrentTime = currentTime;
+            ConnectionType = connectionType;
+            ConnectionAddress = connectionAddress;
             ScannedCards = scannedCards;
             WarningCycles = warningCycles;
             ErrorCycles = errorCycles;
             TotalRelayWarnings = totalRelayWarnings;
             TotalRelayErrors = totalRelayErrors;
+            TotalCardErrors = totalCardErrors;
             CardReports = cardReports;
         }
 
@@ -78,46 +87,6 @@ namespace Noffz.SCU.Service
             RelayErrorIndexes = relayErrorIndexes;
             RelayWarnings = relayWarnings;
             RelayErrors = relayErrors;
-        }
-    }
-
-    public class ReportGenerator
-    {
-        public void GenerateReport(RelayCheckRes res, Config config)
-        {
-            ReportValues reportValues = new ReportValues(
-                DateTime.Now,
-                res.CardRelayChecks.Count,
-                config.WarningCycles,
-                config.ErrorCycles,
-                res.TotalRelayCheck.Warning_indexes.Length,
-                res.TotalRelayCheck.Error_indexes.Length,
-                null);
-
-            List<CardReportValues> cardReports = new List<CardReportValues>();
-            foreach (KeyValuePair<ScuCard, RelayCheckRes.RelayCheck> cardRelayCheck in res.CardRelayChecks)
-            {
-                ScuCard card = cardRelayCheck.Key;
-                RelayCheckRes.RelayCheck cardRes = cardRelayCheck.Value;
-                string[] errors = card.GetErrors();
-
-                CardReportValues cardReport = new CardReportValues(
-                    card.Address,
-                    card.FirmwareVersion,
-                    card.NumberOfInputChannels,
-                    card.NumberOfOutputChannels,
-                    errors.Length,
-                    string.Join(",", errors),
-                    cardRes.Counts,
-                    cardRes.Warning_indexes,
-                    cardRes.Error_indexes,
-                    cardRes.Warning_indexes.Length,
-                    cardRes.Error_indexes.Length);
-                cardReports.Add(cardReport);
-            }
-
-            reportValues.CardReports = cardReports.ToArray();
-
         }
     }
 }

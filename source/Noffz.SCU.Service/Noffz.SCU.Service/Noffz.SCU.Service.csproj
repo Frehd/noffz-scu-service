@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Noffz.SCU.Service</RootNamespace>
     <AssemblyName>Noffz.SCU.Service</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Noffz.SCU.API">
+      <HintPath>..\..\..\..\..\..\..\..\ProgramData\Noffz\SCU\NOFFZ SCU API\bin\Noffz.SCU.API.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,6 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
+    <Compile Include="ConnectionParams.cs" />
+    <Compile Include="RelayCheckRes.cs" />
+    <Compile Include="ReportGenerator.cs" />
     <Compile Include="ScuService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
