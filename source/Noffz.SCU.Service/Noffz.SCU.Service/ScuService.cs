@@ -74,18 +74,20 @@ namespace Noffz.SCU.Service
         public ReportValues GenerateReport()
         {
             RelayCheckRes res = CheckEveryCardsRelays();
-            var totalCardErrors = 0;
+            var totalCardControllerErrors = 0;
+            var numberOfCardsWithErrors = 0;
 
             ReportValues reportValues = new ReportValues(
-               currentTime: DateTime.Now.ToString(),
+               reportTime: DateTime.Now.ToString(),
                connectionType: connectionParams.GetConnectionName(),
                connectionAddress: connectionParams.GetConnectionAddress(),
-               scannedCards: res.CardRelayChecks.Count,
+               numberOfScannedCards: res.CardRelayChecks.Count,
+               numberCardsWithErrors: 0,
                warningCycles: Config.WarningCycles,
                errorCycles: Config.ErrorCycles,
-               totalRelayWarnings: res.TotalRelayCheck.Warning_indexes.Length,
-               totalRelayErrors: res.TotalRelayCheck.Error_indexes.Length,
-               totalCardErrors: 0,
+               totalNumberOfRelayWarnings: res.TotalRelayCheck.Warning_indexes.Length,
+               totalNumberOfRelayErrors: res.TotalRelayCheck.Error_indexes.Length,
+               totalNumberOfCardControllerErrors: 0,
                cardReports: null);
 
             List<CardReportValues> cardReports = new List<CardReportValues>();
@@ -94,27 +96,35 @@ namespace Noffz.SCU.Service
                 ScuCard card = cardRelayCheck.Key;
                 RelayCheckRes.RelayCheck cardRes = cardRelayCheck.Value;
                 string[] errors = card.GetErrors();
-                totalCardErrors += errors.Length;
+                totalCardControllerErrors += errors.Length;
+                bool cardOk = true;
+                if (errors.Length != 0 || cardRes.Error_indexes.Length != 0)
+                {
+                    numberOfCardsWithErrors++;
+                    cardOk = false;
+                }
 
                 CardReportValues cardReport = new CardReportValues(
-                    address: card.Address,
+                    cardAddress: card.Address,
                     firmwareVersion: card.FirmwareVersion,
                     numberOfInputChannels: card.NumberOfInputChannels,
                     numberOfOutputChannels: card.NumberOfOutputChannels,
-                    numberOfErrors: errors.Length,
-                    errors: string.Join(",", errors),
+                    numberOfControllerErrors: errors.Length,
+                    controllerErrors: string.Join(",", errors),
                     relayCounts: cardRes.Counts,
                     relayStates: cardRes.States,
                     relayCycleWarningStates: cardRes.CycleWarningStates,
                     relayWarningIndexes: cardRes.Warning_indexes,
                     relayErrorIndexes: cardRes.Error_indexes,
                     relayWarnings: cardRes.Warning_indexes.Length,
-                    relayErrors: cardRes.Error_indexes.Length);
+                    relayErrors: cardRes.Error_indexes.Length,
+                    cardStatus: cardOk?"OK":"Error");
 
                 cardReports.Add(cardReport);
             }
 
-            reportValues.TotalCardErrors = totalCardErrors;
+            reportValues.TotalNumberOfCardControllerErrors = totalCardControllerErrors;
+            reportValues.NumberCardsWithErrors = numberOfCardsWithErrors;
             reportValues.CardReports = cardReports.ToArray();
 
             return reportValues;

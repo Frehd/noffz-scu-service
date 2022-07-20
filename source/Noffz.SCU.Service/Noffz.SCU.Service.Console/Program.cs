@@ -50,19 +50,32 @@ namespace Noffz.SCU.Service
                 throw new ApplicationException($"Interface option not recognized: {opts.Interface}");
             }
 
+            Config conf;
+            try
+            {
+                conf = Config.ParseJsonFile(opts.ConfigPath);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"\nError occured while parsing config file! Error message: {e.Message}\nStack Trace: {e.StackTrace}");
+                Console.WriteLine($"Proceeding with default settings...");
+                conf = Config.GetFallback();
+            }
+
+
             try
             {
                 if (opts.Interface == "lan")
                 {
                     var factory = new IPConnectionParamsCreator(opts.Address);
                     var con = factory.Create();
-                    service = new ScuService(con, new Config(100, 800));
+                    service = new ScuService(con, conf);
                 }
                 else if (opts.Interface == "com")
                 {
                     var factory = new COMPortConnectionParamsCreator(int.Parse(opts.Address));
                     var con = factory.Create();
-                    service = new ScuService(con, new Config(100, 800));
+                    service = new ScuService(con, conf);
                 }
             }
             catch (Exception e)
@@ -109,9 +122,9 @@ namespace Noffz.SCU.Service
 
             foreach (CardReportValues card in rep.CardReports)
             {
-                Console.WriteLine($"\nChecking card with address: {card.Address}");
+                Console.WriteLine($"\nChecking card with address: {card.CardAddress}");
                 Console.WriteLine($"\tFirmware version: {card.FirmwareVersion}");
-                Console.WriteLine($"\tError count: {card.NumberOfErrors}\n\tErrors: {(card.NumberOfErrors == 0 ? "No errors" : card.Errors)}");
+                Console.WriteLine($"\tError count: {card.NumberOfControllerErrors}\n\tErrors: {(card.NumberOfControllerErrors == 0 ? "No errors" : card.ControllerErrors)}");
                 Console.WriteLine($"\tNumber of inputs: {card.NumberOfInputChannels}, Number of outputs: {card.NumberOfOutputChannels}");
                 Console.WriteLine("\n\tRelay info:");
 
@@ -122,8 +135,8 @@ namespace Noffz.SCU.Service
 
             }
 
-            Console.WriteLine($"\nTotal relay errors: {rep.TotalRelayErrors}, total relay warnings: {rep.TotalRelayWarnings}");
-            Console.WriteLine($"Total card errors: {rep.TotalCardErrors}");
+            Console.WriteLine($"\nTotal relay errors: {rep.TotalNumberOfRelayErrors}, total relay warnings: {rep.TotalNumberOfRelayWarnings}");
+            Console.WriteLine($"Total card controller errors: {rep.TotalNumberOfCardControllerErrors}");
 
             if (opts.GenerateReport)
             {
