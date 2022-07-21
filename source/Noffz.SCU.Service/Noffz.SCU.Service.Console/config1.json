@@ -1,4 +1,41 @@
 {
-  "WarningCycles": 100,
-  "ErrorCycles": 800
+  "RelayLimitFilter": {
+    "Filter": null,
+    "Children": [
+      {
+        "Filter": {
+          "$type": "Noffz.SCU.Service.Filters+PropertyFilters+CardAddressFilter, Noffz.SCU.Service",
+          "valueMatcher": {
+            "$type": "Noffz.SCU.Service.Filters+ValueMatchers+Same, Noffz.SCU.Service",
+            "Value": 3
+          }
+        },
+        "Children": [
+          {
+            "Filter": {
+              "$type": "Noffz.SCU.Service.Filters+PropertyFilters+RelayAddressFilter, Noffz.SCU.Service",
+              "valueMatcher": {
+                "$type": "Noffz.SCU.Service.Filters+ValueMatchers+Range, Noffz.SCU.Service",
+                "LowerValue": 0,
+                "HigherValue": 5
+              }
+            },
+            "Children": [],
+            "RelayLimit": {
+              "WarningCycles": 200,
+              "ErrorCycles": 400
+            }
+          }
+        ],
+        "RelayLimit": {
+          "WarningCycles": 1000,
+          "ErrorCycles": 8000
+        }
+      }
+    ],
+    "RelayLimit": {
+      "WarningCycles": 100,
+      "ErrorCycles": 800
+    }
+  }
 }

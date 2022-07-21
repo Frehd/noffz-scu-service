@@ -17,9 +17,7 @@ namespace Noffz.SCU.Service
         public string ConnectionType { get; set; }
         public string ConnectionAddress { get; set; }
         public int NumberOfScannedCards { get; set; }
-        public int NumberCardsWithErrors { get; set; }
-        public uint WarningCycles { get; set; }
-        public uint ErrorCycles { get; set; }
+        public int NumberOfCardsWithErrors { get; set; }
         public int TotalNumberOfRelayWarnings { get; set; }
         public int TotalNumberOfRelayErrors { get; set; }
         public int TotalNumberOfCardControllerErrors { get; set; }
@@ -29,9 +27,7 @@ namespace Noffz.SCU.Service
             string connectionType,
             string connectionAddress,
             int numberOfScannedCards,
-            int numberCardsWithErrors,
-            uint warningCycles,
-            uint errorCycles,
+            int numberOfCardsWithErrors,
             int totalNumberOfRelayWarnings,
             int totalNumberOfRelayErrors,
             int totalNumberOfCardControllerErrors,
@@ -41,9 +37,7 @@ namespace Noffz.SCU.Service
             ConnectionType = connectionType;
             ConnectionAddress = connectionAddress;
             NumberOfScannedCards = numberOfScannedCards;
-            NumberCardsWithErrors = numberCardsWithErrors;
-            WarningCycles = warningCycles;
-            ErrorCycles = errorCycles;
+            NumberOfCardsWithErrors = numberOfCardsWithErrors;
             TotalNumberOfRelayWarnings = totalNumberOfRelayWarnings;
             TotalNumberOfRelayErrors = totalNumberOfRelayErrors;
             TotalNumberOfCardControllerErrors = totalNumberOfCardControllerErrors;
@@ -62,8 +56,10 @@ namespace Noffz.SCU.Service
         public int NumberOfOutputChannels { get; set; }
         public int NumberOfControllerErrors { get; set; }
         public string ControllerErrors { get; set; }
-        public uint[] RelayCounts { get; set; }
         public bool[] RelayStates { get; set; }
+        public uint[] RelayCounts { get; set; }
+        public uint[] WarningLimits { get; set; }
+        public uint[] ErrorLimits { get; set; }
         public string[] RelayCycleWarningStates { get; set; }
         public int[] RelayWarningIndexes { get; set; }
         public int[] RelayErrorIndexes { get; set; }
@@ -78,8 +74,10 @@ namespace Noffz.SCU.Service
             int numberOfOutputChannels,
             int numberOfControllerErrors,
             string controllerErrors,
-            uint[] relayCounts,
             bool[] relayStates,
+            uint[] relayCounts,
+            uint[] warningLimits,
+            uint[] errorLimits,
             string[] relayCycleWarningStates,
             int[] relayWarningIndexes,
             int[] relayErrorIndexes,
@@ -93,8 +91,10 @@ namespace Noffz.SCU.Service
             NumberOfOutputChannels = numberOfOutputChannels;
             NumberOfControllerErrors = numberOfControllerErrors;
             ControllerErrors = controllerErrors;
-            RelayCounts = relayCounts;
             RelayStates = relayStates;
+            RelayCounts = relayCounts;
+            WarningLimits = warningLimits;
+            ErrorLimits = errorLimits;
             RelayCycleWarningStates = relayCycleWarningStates;
             RelayWarningIndexes = relayWarningIndexes;
             RelayErrorIndexes = relayErrorIndexes;
@@ -167,8 +167,8 @@ namespace Noffz.SCU.Service
                         relayNumber: i,
                         relayState: card.RelayStates[i],
                         relayCycles: card.RelayCounts[i],
-                        warningLimit: rep.WarningCycles,
-                        errorLimit: rep.ErrorCycles,
+                        warningLimit: card.WarningLimits[i],
+                        errorLimit: card.ErrorLimits[i],
                         relayStatus: card.RelayCycleWarningStates[i]);
                     relays.Add(relayLine);
 

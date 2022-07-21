@@ -129,8 +129,8 @@ namespace Noffz.SCU.Service
                 Console.WriteLine("\n\tRelay info:");
 
                 Console.WriteLine($"\t\tTotal errors: {card.RelayErrors}, total warnings: {card.RelayWarnings}");
-                Console.WriteLine($"\t\tRelays with warnings (>{rep.WarningCycles} cycles): {string.Join(",", card.RelayWarningIndexes)}");
-                Console.WriteLine($"\t\tRelays with errors (>{rep.ErrorCycles} cycles): {string.Join(",", card.RelayErrorIndexes)}");
+                Console.WriteLine($"\t\tRelays with warnings: {string.Join(",", card.RelayWarningIndexes)}");
+                Console.WriteLine($"\t\tRelays with errors: {string.Join(",", card.RelayErrorIndexes)}");
 
 
             }

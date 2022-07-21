@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Noffz.SCU.Service.Filters;
+using static Noffz.SCU.Service.LimitMatcher;
 
 namespace Noffz.SCU.Service
 {
@@ -11,30 +13,80 @@ namespace Noffz.SCU.Service
     {
         public class RelayCheck
         {
-            public uint[] Counts { get; }
-            public bool[] States { get; }
+            public uint[] Counts { get; set; }
+            public bool[] States { get; set; }
             public string[] CycleWarningStates { get; }
-            public int[] Warning_indexes;
-            public int[] Error_indexes;
+            public int[] WarningIndexes { get; set; }
+            public int[] ErrorIndexes { get; set; }
+            public uint[] WarningLimits { get; set; }
+            public uint[] ErrorLimits { get; set; }
 
-            public RelayCheck(uint[] counts, bool[] states, Config config)
+            public RelayCheck(uint[] counts, bool[] states, ScuCard card, Config config)
             {
                 Counts = counts;
                 States = states;
-                var indexed_counts = counts.Select((value, index) => new { value, index });
                 CycleWarningStates = Enumerable.Repeat("OK", counts.Length).ToArray();
+                WarningLimits = new uint[counts.Length];
+                ErrorLimits = new uint[counts.Length];
+                List<int> warningIndexes = new List<int>();
+                List<int> errorIndexes = new List<int>();
 
-                Warning_indexes = indexed_counts.Where(c => c.value >= config.WarningCycles && c.value < config.ErrorCycles).Select(c => c.index).ToArray();
-                Error_indexes = indexed_counts.Where(c => c.value >= config.ErrorCycles).Select(c => c.index).ToArray();
+                for (int i = 0; i < counts.Length; i++)
+                {
+                    FilterInput filterInput = new FilterInput(null, card.Address, i);
+                    RelayLimit limit = config.GetRelayLimit(filterInput);
+                    WarningLimits[i] = limit.WarningCycles;
+                    ErrorLimits[i] = limit.ErrorCycles;
 
-                foreach (int error_idx in Error_indexes)
-                {
-                    CycleWarningStates[error_idx] = "Error";
+                    if (counts[i] >= limit.WarningCycles && counts[i] < limit.ErrorCycles)
+                    {
+                        CycleWarningStates[i] = "Warning";
+                        warningIndexes.Add(i);
+                    }
+                    else if (counts[i] >= limit.ErrorCycles)
+                    {
+                        CycleWarningStates[i] = "Error";
+                        errorIndexes.Add(i);
+                    }
                 }
-                foreach (int warning_idx in Warning_indexes)
+                WarningIndexes = warningIndexes.ToArray();
+                ErrorIndexes = errorIndexes.ToArray();
+            }
+
+            public RelayCheck()
+            {
+            }
+
+            public RelayCheck(IEnumerable<RelayCheck> relayChecks)
+            {
+                List<uint> counts = new List<uint>();
+                List<bool> states = new List<bool>();
+                List<string> cycleWarningStates = new List<string>();
+                List<int> warningIndexes = new List<int>();
+                List<int> errorIndexes = new List<int>();
+                List<uint> warningLimits = new List<uint>();
+                List<uint> errorLimits = new List<uint>();
+
+
+                foreach (RelayCheck check in relayChecks)
                 {
-                    CycleWarningStates[warning_idx] = "Warning";
+                    counts.AddRange(check.Counts);
+                    states.AddRange(check.States);
+                    cycleWarningStates.AddRange(check.CycleWarningStates);
+                    warningIndexes.AddRange(check.WarningIndexes);
+                    errorIndexes.AddRange(check.ErrorIndexes);
+                    warningLimits.AddRange(check.ErrorLimits);
+                    errorLimits.AddRange(check.ErrorLimits);
                 }
+
+                Counts = counts.ToArray();
+                States = states.ToArray();
+                CycleWarningStates = cycleWarningStates.ToArray();
+                WarningIndexes = warningIndexes.ToArray();
+                ErrorIndexes = errorIndexes.ToArray();
+                WarningLimits = warningLimits.ToArray();
+                ErrorLimits = errorLimits.ToArray();
+
             }
         }
 
@@ -54,7 +106,7 @@ namespace Noffz.SCU.Service
                 CardRelayChecks.Add(cardCheck.Key, cardCheck.Value);
             }
 
-            TotalRelayCheck = new RelayCheck(allCounts.ToArray(), allStates.ToArray(), config);
+            TotalRelayCheck = new RelayCheck(CardRelayChecks.Values);
         }
     }
 }

@@ -31,6 +31,7 @@ namespace Noffz.SCU.Service
 
         public RelayCheckRes.RelayCheck CheckRelays(ScuCard card)
         {
+            Console.Write($"Reading cards relay info (Addr: {card.Address})");
             uint[] cnt_arr;
             bool[] state_arr;
             try
@@ -47,7 +48,7 @@ namespace Noffz.SCU.Service
 
             if (cnt_arr.Length == 0)
             {
-                Console.WriteLine($"Addressing Relays one by one! (Addr: {card.Address})");
+                Console.Write($"\tAddressing Relays one by one!");
                 cnt_arr = new uint[card.NumberOfOutputChannels];
                 state_arr = new bool[card.NumberOfOutputChannels];
                 for (int i = 0; i < card.NumberOfOutputChannels; i++)
@@ -56,7 +57,8 @@ namespace Noffz.SCU.Service
                     state_arr[i] = card.GetRelayState(i);
                 }
             }
-            return new RelayCheckRes.RelayCheck(cnt_arr, state_arr, Config);
+            Console.WriteLine("");
+            return new RelayCheckRes.RelayCheck(cnt_arr, state_arr, card, Config);
         }
 
         public RelayCheckRes CheckEveryCardsRelays()
@@ -82,11 +84,9 @@ namespace Noffz.SCU.Service
                connectionType: connectionParams.GetConnectionName(),
                connectionAddress: connectionParams.GetConnectionAddress(),
                numberOfScannedCards: res.CardRelayChecks.Count,
-               numberCardsWithErrors: 0,
-               warningCycles: Config.WarningCycles,
-               errorCycles: Config.ErrorCycles,
-               totalNumberOfRelayWarnings: res.TotalRelayCheck.Warning_indexes.Length,
-               totalNumberOfRelayErrors: res.TotalRelayCheck.Error_indexes.Length,
+               numberOfCardsWithErrors: 0,
+               totalNumberOfRelayWarnings: res.TotalRelayCheck.WarningIndexes.Length,
+               totalNumberOfRelayErrors: res.TotalRelayCheck.ErrorIndexes.Length,
                totalNumberOfCardControllerErrors: 0,
                cardReports: null);
 
@@ -97,11 +97,15 @@ namespace Noffz.SCU.Service
                 RelayCheckRes.RelayCheck cardRes = cardRelayCheck.Value;
                 string[] errors = card.GetErrors();
                 totalCardControllerErrors += errors.Length;
-                bool cardOk = true;
-                if (errors.Length != 0 || cardRes.Error_indexes.Length != 0)
+                string cardStatus = "OK";
+                if (errors.Length != 0 || cardRes.ErrorIndexes.Length != 0)
                 {
                     numberOfCardsWithErrors++;
-                    cardOk = false;
+                    cardStatus = "Error";
+                }
+                else if (cardRes.WarningIndexes.Length != 0)
+                {
+                    cardStatus = "Warning";
                 }
 
                 CardReportValues cardReport = new CardReportValues(
@@ -111,20 +115,22 @@ namespace Noffz.SCU.Service
                     numberOfOutputChannels: card.NumberOfOutputChannels,
                     numberOfControllerErrors: errors.Length,
                     controllerErrors: string.Join(",", errors),
-                    relayCounts: cardRes.Counts,
                     relayStates: cardRes.States,
+                    relayCounts: cardRes.Counts,
+                    warningLimits: cardRes.WarningLimits,
+                    errorLimits: cardRes.ErrorLimits,
                     relayCycleWarningStates: cardRes.CycleWarningStates,
-                    relayWarningIndexes: cardRes.Warning_indexes,
-                    relayErrorIndexes: cardRes.Error_indexes,
-                    relayWarnings: cardRes.Warning_indexes.Length,
-                    relayErrors: cardRes.Error_indexes.Length,
-                    cardStatus: cardOk?"OK":"Error");
+                    relayWarningIndexes: cardRes.WarningIndexes,
+                    relayErrorIndexes: cardRes.ErrorIndexes,
+                    relayWarnings: cardRes.WarningIndexes.Length,
+                    relayErrors: cardRes.ErrorIndexes.Length,
+                    cardStatus: cardStatus);
 
                 cardReports.Add(cardReport);
             }
 
             reportValues.TotalNumberOfCardControllerErrors = totalCardControllerErrors;
-            reportValues.NumberCardsWithErrors = numberOfCardsWithErrors;
+            reportValues.NumberOfCardsWithErrors = numberOfCardsWithErrors;
             reportValues.CardReports = cardReports.ToArray();
 
             return reportValues;
