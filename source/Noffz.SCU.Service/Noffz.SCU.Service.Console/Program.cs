@@ -31,6 +31,9 @@ namespace Noffz.SCU.Service
 
             [Option("card-range", Default = "0-20", HelpText = "Card Address range to be scanned.")]
             public string CardAddressRange { get; set; }
+
+            [Option("no-exit-code", Default = false, HelpText = "Disables the return of exit code 1 in case of any warnings being present.")]
+            public bool DisableExitCodes { get; set; }
         }
 
         static void Main(string[] args)
@@ -145,6 +148,15 @@ namespace Noffz.SCU.Service
             }
 
             Console.WriteLine("Done!");
+
+            if (!opts.DisableExitCodes)
+            {
+                if (rep.TotalNumberOfCardControllerErrors != 0 || rep.TotalNumberOfRelayErrors != 0 || rep.TotalNumberOfRelayWarnings != 0)
+                {
+                    Environment.Exit(1);
+                }
+            }
+            Environment.Exit(0);
         }
     }
 }
