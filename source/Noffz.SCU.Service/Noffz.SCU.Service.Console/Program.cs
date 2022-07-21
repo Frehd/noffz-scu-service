@@ -143,8 +143,9 @@ namespace Noffz.SCU.Service
 
             if (opts.GenerateReport)
             {
-                Console.WriteLine("Generating CSVs");
+                Console.WriteLine("Generating Reports...");
                 ReportGenerator.GenerateCSV(rep);
+                ReportGenerator.GenerateHTML(rep);
             }
 
             Console.WriteLine("Done!");

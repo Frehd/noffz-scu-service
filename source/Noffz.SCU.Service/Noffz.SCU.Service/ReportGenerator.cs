@@ -45,6 +45,33 @@ namespace Noffz.SCU.Service
         }
 
         public CardReportValues[] CardReports { get; set; }
+
+        public static string GetHtmlTableHeader()
+        {
+            return @"<tr>
+                <th> ReportTime </th>
+                <th> ConnectionType </th>
+                <th> ConnectionAddress </th>
+                <th> NumberOfScannedCards </th>
+                <th> numberOfCardsWithErrors </th>
+                <th> TotalNumberOfRelayWarnings </th>
+                <th> TotalNumberOfRelayErrors </th>
+                <th> TotalNumberOfCardControllerErrors </th>
+            </th> ";
+        }
+        public string GetHtml()
+        {
+            return $@"<tr>
+                <th> {ReportTime} </th>
+                <th> {ConnectionType} </th>
+                <th> {ConnectionAddress} </th>
+                <th> {NumberOfScannedCards} </th>
+                <th> {NumberOfCardsWithErrors} </th>
+                <th> {TotalNumberOfRelayWarnings} </th>
+                <th> {TotalNumberOfRelayErrors} </th>
+                <th> {TotalNumberOfCardControllerErrors} </th>
+            </th> ";
+        }
     }
 
     public struct CardReportValues
@@ -102,6 +129,35 @@ namespace Noffz.SCU.Service
             RelayErrors = relayErrors;
             CardStatus = cardStatus;
         }
+
+        public static string GetHtmlTableHeader()
+        {
+            return @"<tr>
+                <th> CardAddress </th>
+                <th> FirmwareVersion </th>
+                <th> NumberOfInputChannels </th>
+                <th> NumberOfOutputChannels </th>
+                <th> NumberOfControllerErrors </th>
+                <th> ControllerErrors </th>
+                <th> RelayWarnings </th>
+                <th> RelayErrors </th>
+                <th> CardStatus </th>
+            </th> ";
+        }
+        public string GetHtml()
+        {
+            return $@"<tr>
+                <th> {CardAddress} </th>
+                <th> {FirmwareVersion} </th>
+                <th> {NumberOfInputChannels} </th>
+                <th> {NumberOfOutputChannels} </th>
+                <th> {NumberOfControllerErrors} </th>
+                <th> {ControllerErrors} </th>
+                <th> {RelayWarnings} </th>
+                <th> {RelayErrors} </th>
+                <th> {CardStatus} </th>
+            </th> ";
+        }
     }
 
     struct RelayLine
@@ -123,6 +179,31 @@ namespace Noffz.SCU.Service
             WarningLimit = warningLimit;
             ErrorLimit = errorLimit;
             RelayStatus = relayStatus;
+        }
+
+        public static string GetHtmlTableHeader()
+        {
+            return @"<tr>
+                <th> CardAddress </th>
+                <th> RelayNumber </th>
+                <th> RelayState </th>
+                <th> RelayCycles </th>
+                <th> WarningLimit </th>
+                <th> ErrorLimit </th>
+                <th> RelayStatus </th>
+            </th> ";
+        }
+        public string GetHtml()
+        {
+            return $@"<tr>
+                <th> {CardAddress} </th>
+                <th> {RelayNumber} </th>
+                <th> {RelayState} </th>
+                <th> {RelayCycles} </th>
+                <th> {WarningLimit} </th>
+                <th> {ErrorLimit} </th>
+                <th> {RelayStatus} </th>
+            </th> ";
         }
     }
 
@@ -146,7 +227,7 @@ namespace Noffz.SCU.Service
             csv.NextRecord();
 
             csv.NextRecord();
-            csv.WriteField("Card table");
+            csv.WriteField("Card Table");
             csv.NextRecord();
             csv.WriteHeader(typeof(CardReportValues));
             csv.NextRecord();
@@ -170,8 +251,8 @@ namespace Noffz.SCU.Service
                         warningLimit: card.WarningLimits[i],
                         errorLimit: card.ErrorLimits[i],
                         relayStatus: card.RelayCycleWarningStates[i]);
-                    relays.Add(relayLine);
 
+                    relays.Add(relayLine);
                 }
             }
             csv.WriteField("Relay Table");
@@ -179,6 +260,87 @@ namespace Noffz.SCU.Service
             csv.WriteHeader(typeof(RelayLine));
             csv.NextRecord();
             csv.WriteRecords(relays);
+        }
+
+        public static void GenerateHTML(ReportValues rep)
+        {
+
+            StringBuilder cardTableString = new StringBuilder();
+            StringBuilder relayTableString = new StringBuilder();
+            foreach (CardReportValues cardReport in rep.CardReports)
+            {
+                cardTableString.Append(cardReport.GetHtml());
+
+                for (int i = 0; i < cardReport.RelayCounts.Length; i++)
+                {
+                    RelayLine relayLine = new RelayLine(
+                        cardAddress: cardReport.CardAddress,
+                        relayNumber: i,
+                        relayState: cardReport.RelayStates[i],
+                        relayCycles: cardReport.RelayCounts[i],
+                        warningLimit: cardReport.WarningLimits[i],
+                        errorLimit: cardReport.ErrorLimits[i],
+                        relayStatus: cardReport.RelayCycleWarningStates[i]);
+
+                    relayTableString.Append(relayLine.GetHtml());
+                }
+            }
+
+            string page =
+$@"<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        :is(h1, h2, h3, h4, h5, h6) {{
+            font-family: arial, sans-serif;
+        }}
+        table {{
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }}
+
+        td, th {{
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }}
+
+        tr:nth-child(even) {{
+            background-color: #dddddd;
+        }}
+    </style>
+</head>
+<body>
+
+    <h2>Noffz.SCU.Service Report</h2>
+
+    <table>
+        {ReportValues.GetHtmlTableHeader()}
+        {rep.GetHtml()}
+    </table>
+
+    <h3>Card Table</h3>
+
+    <table>
+        {CardReportValues.GetHtmlTableHeader()}
+        {cardTableString}
+    </table>
+
+    <h3>Relay Table</h3>
+
+    <table>
+        {RelayLine.GetHtmlTableHeader()}
+        {relayTableString}
+    </table>
+
+</body>
+</html>";
+
+            using (var writer = new StreamWriter("report.html"))
+            {
+                writer.Write(page);
+            }
         }
     }
 }
