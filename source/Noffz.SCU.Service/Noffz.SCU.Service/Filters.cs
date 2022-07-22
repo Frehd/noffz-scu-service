@@ -38,6 +38,11 @@ namespace Noffz.SCU.Service
 
         public abstract class ValueMatchers
         {
+            private static object changeType(object value, Type conversionType)
+            {
+                return Convert.ChangeType(value, conversionType);
+            }
+
             public interface IValueMatcher
             {
                 bool Matches(object input);
@@ -53,7 +58,8 @@ namespace Noffz.SCU.Service
                 public object Value { get; set; }
                 public bool Matches(object input)
                 {
-                    return Value.Equals(input);
+                    var value = changeType(input, Value.GetType());
+                    return Value.Equals(value);
                 }
             }
 
@@ -69,7 +75,9 @@ namespace Noffz.SCU.Service
                 public IComparable HigherValue { get; set; }
                 public bool Matches(object input)
                 {
-                    return LowerValue.CompareTo(input) <= 0 && HigherValue.CompareTo(input) >= 0;
+                    var valueL = changeType(input, LowerValue.GetType());
+                    var valueH = changeType(input, HigherValue.GetType());
+                    return LowerValue.CompareTo(valueL) <= 0 && HigherValue.CompareTo(valueH) >= 0;
                 }
             }
 
