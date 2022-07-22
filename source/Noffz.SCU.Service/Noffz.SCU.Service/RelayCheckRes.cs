@@ -9,8 +9,16 @@ using static Noffz.SCU.Service.LimitMatcher;
 
 namespace Noffz.SCU.Service
 {
+
+    /// <summary>
+    /// Contains the result of checking the relays of multiple cards.
+    /// </summary>
     public class RelayCheckRes
     {
+
+        /// <summary>
+        /// Contains the result of checking all the relays of one card.
+        /// </summary>
         public class RelayCheck
         {
             public uint[] Counts { get; set; }
@@ -57,6 +65,10 @@ namespace Noffz.SCU.Service
             {
             }
 
+            /// <summary>
+            /// Creates a compound <c>RelayCheck</c> object from multiple <c>RelayCheck</c> objects.
+            /// </summary>
+            /// <param name="relayChecks">The collection of <c>RelayCheck</c> objects to be combined.</param>
             public RelayCheck(IEnumerable<RelayCheck> relayChecks)
             {
                 List<uint> counts = new List<uint>();
@@ -93,7 +105,7 @@ namespace Noffz.SCU.Service
         public Dictionary<ScuCard, RelayCheck> CardRelayChecks { get; } = new Dictionary<ScuCard, RelayCheck>();
         public RelayCheck TotalRelayCheck { get; }
 
-        public RelayCheckRes(Dictionary<ScuCard, RelayCheck> cardRelayCounts, Config config)
+        public RelayCheckRes(Dictionary<ScuCard, RelayCheck> cardRelayCounts)
         {
             List<uint> allCounts = new List<uint>();
             List<bool> allStates = new List<bool>();

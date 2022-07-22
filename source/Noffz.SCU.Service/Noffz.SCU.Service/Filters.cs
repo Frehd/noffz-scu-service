@@ -8,6 +8,9 @@ namespace Noffz.SCU.Service
 {
     public abstract class Filters
     {
+        /// <summary>
+        /// The information provided for matching a relay to a <c>RelayLimit</c>.
+        /// </summary>
         public struct FilterInput
         {
             public string CardName { get; set; }
@@ -22,6 +25,9 @@ namespace Noffz.SCU.Service
             }
         }
 
+        /// <summary>
+        /// A <c>Filter</c> decides wether or not a rule applies to the given <c>FilterInput</c>
+        /// </summary>
         public abstract class Filter
         {
             public ValueMatchers.IValueMatcher valueMatcher;
@@ -35,10 +41,12 @@ namespace Noffz.SCU.Service
         }
 
 
-
+        /// <summary>
+        /// A <c>ValueMatcher</c> is used in a <c>Filter</c> to match a property of a <c>FilterInput</c>.
+        /// </summary>
         public abstract class ValueMatchers
         {
-            private static object changeType(object value, Type conversionType)
+            private static object ChangeType(object value, Type conversionType)
             {
                 return Convert.ChangeType(value, conversionType);
             }
@@ -58,7 +66,7 @@ namespace Noffz.SCU.Service
                 public object Value { get; set; }
                 public bool Matches(object input)
                 {
-                    var value = changeType(input, Value.GetType());
+                    var value = ChangeType(input, Value.GetType());
                     return Value.Equals(value);
                 }
             }
@@ -75,13 +83,17 @@ namespace Noffz.SCU.Service
                 public IComparable HigherValue { get; set; }
                 public bool Matches(object input)
                 {
-                    var valueL = changeType(input, LowerValue.GetType());
-                    var valueH = changeType(input, HigherValue.GetType());
+                    var valueL = ChangeType(input, LowerValue.GetType());
+                    var valueH = ChangeType(input, HigherValue.GetType());
                     return LowerValue.CompareTo(valueL) <= 0 && HigherValue.CompareTo(valueH) >= 0;
                 }
             }
 
         }
+
+        /// <summary>
+        /// A <c>Filter</c> decides wether or not a rule applies to the given <c>FilterInput</c>
+        /// </summary>
         public abstract class PropertyFilters
         {
             public class CardNameFilter : Filter

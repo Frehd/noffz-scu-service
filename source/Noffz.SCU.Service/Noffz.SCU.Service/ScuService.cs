@@ -22,6 +22,16 @@ namespace Noffz.SCU.Service
             Scu = c_params.Connect();
         }
 
+        /// <summary>
+        /// Searches for SCU cards in a single SCU chassiss and saves them.
+        /// </summary>
+        /// <param name="startCardAddress">
+        /// Start address of a card to search for.
+        /// </param>
+        /// <param name="startCardAddress">
+        /// End adress of a card to search for.
+        /// </param>
+        /// <returns> The number of SCU cards found. </returns>
         public int DiscoverCards(int startCardAddress, int endCardAddress)
         {
             Cards = Scu.FindAllCards(startCardAddress, endCardAddress);
@@ -29,6 +39,12 @@ namespace Noffz.SCU.Service
             return Cards.Length;
         }
 
+
+        /// <summary>
+        /// Checks the relays of a single card.
+        /// </summary>
+        /// <param name="card">The card of which the relays should be checked.</param>
+        /// <returns>A <c>RelayCheck</c> object containing the results.</returns>
         public RelayCheckRes.RelayCheck CheckRelays(ScuCard card)
         {
             Console.Write($"Reading cards relay info (Addr: {card.Address})");
@@ -61,6 +77,10 @@ namespace Noffz.SCU.Service
             return new RelayCheckRes.RelayCheck(cnt_arr, state_arr, card, Config);
         }
 
+        /// <summary>
+        /// Checks the relays of every card previously found.
+        /// </summary>
+        /// <returns>A <c>RelayCheckRes</c> object containing the results.</returns>
         public RelayCheckRes CheckEveryCardsRelays()
         {
             Dictionary<ScuCard, RelayCheckRes.RelayCheck> cardRelayCounts = new Dictionary<ScuCard, RelayCheckRes.RelayCheck>();
@@ -69,10 +89,14 @@ namespace Noffz.SCU.Service
                 cardRelayCounts.Add(card, CheckRelays(card));
             }
 
-            RelayCheckRes relayCheckRes = new RelayCheckRes(cardRelayCounts, Config);
+            RelayCheckRes relayCheckRes = new RelayCheckRes(cardRelayCounts);
             return relayCheckRes;
         }
 
+        /// <summary>
+        /// Checks the relays of every found card and generates a report object.
+        /// </summary>
+        /// <returns>A <c>ReportValues</c> object containing the results.</returns>
         public ReportValues GenerateReport()
         {
             RelayCheckRes res = CheckEveryCardsRelays();

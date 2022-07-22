@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 
 namespace Noffz.SCU.Service
 {
+
+    /// <summary>
+    /// Contains all the values that go into a report.
+    /// </summary>
     public struct ReportValues
     {
         public string ReportTime { get; set; }
@@ -74,6 +78,9 @@ namespace Noffz.SCU.Service
         }
     }
 
+    /// <summary>
+    /// Contains all the values that are associated with a specific card in a report.
+    /// </summary>
     public struct CardReportValues
     {
 
@@ -160,6 +167,10 @@ namespace Noffz.SCU.Service
         }
     }
 
+
+    /// <summary>
+    /// Represents a line in a table containing information about relays.
+    /// </summary>
     struct RelayLine
     {
         public int CardAddress { get; set; }
@@ -207,11 +218,21 @@ namespace Noffz.SCU.Service
         }
     }
 
+    /// <summary>
+    /// Generates a report in a specified file format.
+    /// </summary>
     public class ReportGenerator
     {
+
+        /// <summary>
+        /// Generates a CSV report.
+        /// </summary>
+        /// <param name="rep">The <c>ReportValues</c> object containing the information for the report.</param>
+        /// <param name="path">The path where the report is saved to.</param>
+        /// <param name="fileName">The filename of the report.</param>
         public static void GenerateCSV(ReportValues rep, string path, string fileName)
         {
-            using (var writer = new StreamWriter(path+fileName))
+            using (var writer = new StreamWriter(path + fileName))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 GenerateGeneralCSV(csv, rep);
@@ -262,6 +283,12 @@ namespace Noffz.SCU.Service
             csv.WriteRecords(relays);
         }
 
+        /// <summary>
+        /// Generates an HTML report.
+        /// </summary>
+        /// <param name="rep">The <c>ReportValues</c> object containing the information for the report.</param>
+        /// <param name="path">The path where the report is saved to.</param>
+        /// <param name="fileName">The filename of the report.</param>
         public static void GenerateHTML(ReportValues rep, string path, string fileName)
         {
 
@@ -345,7 +372,7 @@ $@"<!DOCTYPE html>
 </body>
 </html>";
 
-            using (var writer = new StreamWriter(path+fileName))
+            using (var writer = new StreamWriter(path + fileName))
             {
                 writer.Write(page);
             }

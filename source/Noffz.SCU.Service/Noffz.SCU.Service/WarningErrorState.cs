@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Noffz.SCU.Service
 {
+    /// <summary>
+    /// Describes a tri-state warning indication.
+    /// </summary>
     public enum WarningErrorState
     {
         Ok,

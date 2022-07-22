@@ -39,7 +39,9 @@ namespace Noffz.SCU.Service
         }
     }
 
-
+    /// <summary>
+    /// Describes the parameters to connect to an SCU.
+    /// </summary>
     public interface IConnectionParams
     {
         string GetConnectionName();
@@ -48,6 +50,9 @@ namespace Noffz.SCU.Service
     }
 
 
+    /// <summary>
+    /// Provides the parameters to connect via COMPort to SCU.
+    /// </summary>
     class COMPort : IConnectionParams
     {
         public Int32 ComPortNumber;
@@ -73,6 +78,9 @@ namespace Noffz.SCU.Service
         }
     }
 
+    /// <summary>
+    /// Provides the parameters to connect via LAN to SCU.
+    /// </summary>
     class IP : IConnectionParams
     {
         public string IPAddress;
