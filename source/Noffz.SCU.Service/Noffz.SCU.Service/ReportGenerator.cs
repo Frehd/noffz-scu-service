@@ -304,6 +304,8 @@ $@"<!DOCTYPE html>
             font-family: arial, sans-serif;
             border-collapse: collapse;
             width: 100%;
+            width:0.1%;
+            white-space: nowrap;
         }}
 
         td, th {{
