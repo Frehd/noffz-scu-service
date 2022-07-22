@@ -15,7 +15,7 @@ namespace Noffz.SCU.Service
         {
             public uint[] Counts { get; set; }
             public bool[] States { get; set; }
-            public string[] CycleWarningStates { get; }
+            public WarningErrorState[] CycleWarningStates { get; }
             public int[] WarningIndexes { get; set; }
             public int[] ErrorIndexes { get; set; }
             public uint[] WarningLimits { get; set; }
@@ -25,7 +25,7 @@ namespace Noffz.SCU.Service
             {
                 Counts = counts;
                 States = states;
-                CycleWarningStates = Enumerable.Repeat("OK", counts.Length).ToArray();
+                CycleWarningStates = new WarningErrorState[counts.Length];
                 WarningLimits = new uint[counts.Length];
                 ErrorLimits = new uint[counts.Length];
                 List<int> warningIndexes = new List<int>();
@@ -40,12 +40,12 @@ namespace Noffz.SCU.Service
 
                     if (counts[i] >= limit.WarningCycles && counts[i] < limit.ErrorCycles)
                     {
-                        CycleWarningStates[i] = "Warning";
+                        CycleWarningStates[i] = WarningErrorState.Warning;
                         warningIndexes.Add(i);
                     }
                     else if (counts[i] >= limit.ErrorCycles)
                     {
-                        CycleWarningStates[i] = "Error";
+                        CycleWarningStates[i] = WarningErrorState.Error;
                         errorIndexes.Add(i);
                     }
                 }
@@ -61,7 +61,7 @@ namespace Noffz.SCU.Service
             {
                 List<uint> counts = new List<uint>();
                 List<bool> states = new List<bool>();
-                List<string> cycleWarningStates = new List<string>();
+                List<WarningErrorState> cycleWarningStates = new List<WarningErrorState>();
                 List<int> warningIndexes = new List<int>();
                 List<int> errorIndexes = new List<int>();
                 List<uint> warningLimits = new List<uint>();

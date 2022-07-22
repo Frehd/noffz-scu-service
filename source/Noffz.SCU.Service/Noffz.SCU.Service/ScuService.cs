@@ -12,7 +12,7 @@ namespace Noffz.SCU.Service
         public Config Config { get; set; }
         public ScuSession Scu { get; set; } = null;
         public ScuCard[] Cards { get; set; } = null;
-        private IConnectionParams connectionParams;
+        private readonly IConnectionParams connectionParams;
 
         public ScuService(IConnectionParams c_params, Config config)
         {
@@ -97,15 +97,15 @@ namespace Noffz.SCU.Service
                 RelayCheckRes.RelayCheck cardRes = cardRelayCheck.Value;
                 string[] errors = card.GetErrors();
                 totalCardControllerErrors += errors.Length;
-                string cardStatus = "OK";
+                WarningErrorState cardStatus = WarningErrorState.Ok;
                 if (errors.Length != 0 || cardRes.ErrorIndexes.Length != 0)
                 {
                     numberOfCardsWithErrors++;
-                    cardStatus = "Error";
+                    cardStatus = WarningErrorState.Error;
                 }
                 else if (cardRes.WarningIndexes.Length != 0)
                 {
-                    cardStatus = "Warning";
+                    cardStatus = WarningErrorState.Warning;
                 }
 
                 CardReportValues cardReport = new CardReportValues(

@@ -87,12 +87,12 @@ namespace Noffz.SCU.Service
         public uint[] RelayCounts { get; set; }
         public uint[] WarningLimits { get; set; }
         public uint[] ErrorLimits { get; set; }
-        public string[] RelayCycleWarningStates { get; set; }
+        public WarningErrorState[] RelayCycleWarningStates { get; set; }
         public int[] RelayWarningIndexes { get; set; }
         public int[] RelayErrorIndexes { get; set; }
         public int RelayWarnings { get; set; }
         public int RelayErrors { get; set; }
-        public string CardStatus { get; set; }
+        public WarningErrorState CardStatus { get; set; }
 
         public CardReportValues(
             int cardAddress,
@@ -105,12 +105,12 @@ namespace Noffz.SCU.Service
             uint[] relayCounts,
             uint[] warningLimits,
             uint[] errorLimits,
-            string[] relayCycleWarningStates,
+            WarningErrorState[] relayCycleWarningStates,
             int[] relayWarningIndexes,
             int[] relayErrorIndexes,
             int relayWarnings,
             int relayErrors,
-            string cardStatus)
+            WarningErrorState cardStatus)
         {
             CardAddress = cardAddress;
             FirmwareVersion = firmwareVersion;
@@ -155,7 +155,7 @@ namespace Noffz.SCU.Service
                 <th> {ControllerErrors} </th>
                 <th> {RelayWarnings} </th>
                 <th> {RelayErrors} </th>
-                <th> {CardStatus} </th>
+                <th class='{CardStatus.ToString().ToLower()}'> {CardStatus} </th>
             </th> ";
         }
     }
@@ -168,9 +168,9 @@ namespace Noffz.SCU.Service
         public uint RelayCycles { get; set; }
         public uint WarningLimit { get; set; }
         public uint ErrorLimit { get; set; }
-        public string RelayStatus { get; set; }
+        public WarningErrorState RelayStatus { get; set; }
 
-        public RelayLine(int cardAddress, int relayNumber, bool relayState, uint relayCycles, uint warningLimit, uint errorLimit, string relayStatus)
+        public RelayLine(int cardAddress, int relayNumber, bool relayState, uint relayCycles, uint warningLimit, uint errorLimit, WarningErrorState relayStatus)
         {
             CardAddress = cardAddress;
             RelayNumber = relayNumber;
@@ -202,7 +202,7 @@ namespace Noffz.SCU.Service
                 <th> {RelayCycles} </th>
                 <th> {WarningLimit} </th>
                 <th> {ErrorLimit} </th>
-                <th> {RelayStatus} </th>
+                <th class='{RelayStatus.ToString().ToLower()}'> {RelayStatus} </th>
             </th> ";
         }
     }
@@ -291,6 +291,12 @@ $@"<!DOCTYPE html>
 <html>
 <head>
     <style>
+        .warning {{
+            background-color: yellow;
+        }}
+        .error {{
+            background-color: red;
+        }}
         :is(h1, h2, h3, h4, h5, h6) {{
             font-family: arial, sans-serif;
         }}
