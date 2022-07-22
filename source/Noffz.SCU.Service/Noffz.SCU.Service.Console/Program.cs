@@ -26,7 +26,7 @@ namespace Noffz.SCU.Service
             [Option('r', "report", Default = false, HelpText = "Generate a report.")]
             public bool GenerateReport { get; set; }
 
-            [Option('o', "out", Default = "", HelpText = "Output path for report.")]
+            [Option('o', "out", Default = ".", HelpText = "Output path for report.")]
             public string ReportPath { get; set; }
 
             [Option("card-range", Default = "0-20", HelpText = "Card Address range to be scanned.")]
@@ -144,8 +144,11 @@ namespace Noffz.SCU.Service
             if (opts.GenerateReport)
             {
                 Console.WriteLine("Generating Reports...");
-                ReportGenerator.GenerateCSV(rep);
-                ReportGenerator.GenerateHTML(rep);
+                string timeString = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                Console.WriteLine($"Outputing files to: {opts.ReportPath}\\{timeString}-report.csv");
+                ReportGenerator.GenerateCSV(rep, opts.ReportPath, $"\\{timeString}-report.csv");
+                Console.WriteLine($"Outputing files to: {opts.ReportPath}\\{timeString}-report.html");
+                ReportGenerator.GenerateHTML(rep, opts.ReportPath, $"\\{timeString}-report.html");
             }
 
             Console.WriteLine("Done!");

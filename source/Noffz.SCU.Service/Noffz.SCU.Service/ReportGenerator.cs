@@ -209,9 +209,9 @@ namespace Noffz.SCU.Service
 
     public class ReportGenerator
     {
-        public static void GenerateCSV(ReportValues rep)
+        public static void GenerateCSV(ReportValues rep, string path, string fileName)
         {
-            using (var writer = new StreamWriter("report.csv"))
+            using (var writer = new StreamWriter(path+fileName))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 GenerateGeneralCSV(csv, rep);
@@ -262,7 +262,7 @@ namespace Noffz.SCU.Service
             csv.WriteRecords(relays);
         }
 
-        public static void GenerateHTML(ReportValues rep)
+        public static void GenerateHTML(ReportValues rep, string path, string fileName)
         {
 
             StringBuilder cardTableString = new StringBuilder();
@@ -343,7 +343,7 @@ $@"<!DOCTYPE html>
 </body>
 </html>";
 
-            using (var writer = new StreamWriter("report.html"))
+            using (var writer = new StreamWriter(path+fileName))
             {
                 writer.Write(page);
             }
